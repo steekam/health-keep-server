@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\User;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
@@ -16,7 +16,7 @@ class AuthController extends Controller
   {
     $validator = Validator::make($request->all(), [
       'name' => 'required',
-      'email' => 'required|email',
+      'email' => 'required|email|unique:users',
       'password' => 'required',
       'c_password' => 'required|same:password',
     ]);
