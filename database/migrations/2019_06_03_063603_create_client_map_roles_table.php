@@ -17,7 +17,6 @@ class CreateClientMapRolesTable extends Migration
       $table->bigIncrements('id');
       $table->unsignedBigInteger('client_id')->unsigned();
       $table->unsignedBigInteger('client_role_id')->unsigned();
-      $table->timestamps();
 
       $table->foreign('client_id')
         ->references('client_id')
