@@ -71,7 +71,9 @@ class ClientAuthController extends Controller
 			$validator = Validator::make($data, [
 				'username' => 'required|exists:clients,username',
 				'password' => 'required',
-			]);
+			], [
+				'username.exists' => 'Invalid credentials'
+				]);
 			if ($validator->fails()) return response()->json(['error' => $validator->errors()], 401);
 			// ? get client
 			$client = Client::with('roles')->where('username', $data['username'])->firstOrFail();
