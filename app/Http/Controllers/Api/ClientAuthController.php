@@ -42,7 +42,7 @@ class ClientAuthController extends Controller
 			'client_role' => 'required|exists:client_roles,role_name'
 		]);
 		if ($validator->fails()) {
-			return response()->json(['error' => $validator->errors()], 401);
+			return response()->json(['error' => $validator->errors()]);
 		}
 
 		$client_data = $data;
