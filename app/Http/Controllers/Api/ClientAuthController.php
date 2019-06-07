@@ -59,7 +59,7 @@ class ClientAuthController extends Controller
 			return response()->json(['client' => $created_client], $this->successStatus);
 		} catch (\Throwable $th) {
 			DB::rollBack();
-			return response()->json(['error' => $th->getMessage()], 401);
+			return response()->json(['error' => $th->getMessage()]);
 		}
 	}
 
@@ -74,13 +74,13 @@ class ClientAuthController extends Controller
 			], [
 				'username.exists' => 'Invalid credentials'
 				]);
-			if ($validator->fails()) return response()->json(['error' => $validator->errors()], 401);
+			if ($validator->fails()) return response()->json(['error' => $validator->errors()]);
 			// ? get client
 			$client = Client::with('roles')->where('username', $data['username'])->firstOrFail();
 
 			if (!Hash::check($data['password'], $client->password)) throw new \Exception("Invalid credentials");
 		} catch (\Throwable $th) {
-			return response()->json(['error' => $th->getMessage()], 401);
+			return response()->json(['error' => $th->getMessage()]);
 		}
 		return response()->json(['success' => $client], $this->successStatus);
 	}
@@ -144,7 +144,7 @@ class ClientAuthController extends Controller
 			}
 			return response()->json([
 				'error' => $error_res,
-			], 401);
+			]);
 		}
 	}
 
@@ -172,7 +172,7 @@ class ClientAuthController extends Controller
 			}
 			return response()->json([
 				'error' => $error_res,
-			], 401);
+			]);
 		}
 	}
 }
