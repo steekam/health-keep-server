@@ -40,10 +40,10 @@ class ClientAuthController extends Controller
 			'email' => 'required|email|unique:clients',
 			'password' => 'required',
 			'client_role' => 'required|exists:client_roles,role_name'
-		]);
-		if ($validator->fails()) {
-			return response()->json(['error' => $validator->errors()]);
-		}
+		])->validate();
+		// if ($validator->fails()) {
+		// 	return response()->json($validator->errors(), 401);
+		// }
 
 		$client_data = $data;
 		unset($client_data['client_role']);
@@ -56,7 +56,7 @@ class ClientAuthController extends Controller
 			DB::commit();
 
 			$created_client = Client::with('roles')->find($client->client_id);
-			return response()->json(['client' => $created_client], $this->successStatus);
+			return response()->json($created_client, $this->successStatus);
 		} catch (\Throwable $th) {
 			DB::rollBack();
 			return response()->json(['error' => $th->getMessage()]);
