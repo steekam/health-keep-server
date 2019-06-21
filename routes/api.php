@@ -1,7 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
-
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -17,10 +15,15 @@ Route::prefix('v1')->group(function () {
 	Route::post('login', 'Api\AuthController@login');
 	Route::post('register', 'Api\AuthController@register');
 	Route::post('user', 'Api\AuthController@getUser');
+
+	//? Api key protected routes
 	Route::group(['middleware' => 'auth:api'], function () {
 		Route::post('client_login', 'Api\ClientAuthController@login');
 		Route::apiResources([
 			'clients' => 'Api\ClientAuthController'
 		]);
+
+		//? Email verification
+		Route::get('email/resend/{id}','Api\ClientVerificationController@resend')->name('client.verification.resend');
 	});
 });
