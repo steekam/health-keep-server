@@ -17,6 +17,7 @@ use Throwable;
 class ClientAuthController extends Controller
 {
 	public $successStatus = 200;
+	public $errorStatus = 422;
 
 	/**
 	 * Display a listing of the resource.
@@ -62,7 +63,7 @@ class ClientAuthController extends Controller
 			return response()->json($created_client, $this->successStatus);
 		} catch (Throwable $th) {
 			DB::rollBack();
-			return response()->json(['error' => $th->getMessage()]);
+			return response()->json(['error' => $th->getMessage()], $this->errorStatus);
 		}
 	}
 
@@ -70,28 +71,26 @@ class ClientAuthController extends Controller
 	{
 		$data = $request->all();
 		$client = [];
+		Validator::make($data, [
+			'username' => 'required|exists:clients,username',
+			'password' => 'required',
+		], [
+			'username.exists' => 'Invalid credentials'
+		])->validate();
 		try {
-			$validator = Validator::make($data, [
-				'username' => 'required|exists:clients,username',
-				'password' => 'required',
-			], [
-				'username.exists' => 'Invalid credentials'
-				]);
-			if ($validator->fails()) return response()->json(['error' => $validator->errors()]);
 			// ? get client
 			$client = Client::with('roles')->where('username', $data['username'])->firstOrFail();
-
 			if (!Hash::check($data['password'], $client->password)) throw new Exception("Invalid credentials");
 		} catch (Throwable $th) {
-			return response()->json(['error' => $th->getMessage()]);
+			return response()->json(['error' => $th->getMessage()], $this->errorStatus);
 		}
-		return response()->json(['success' => $client], $this->successStatus);
+		return response()->json($client);
 	}
 
 	/**
 	 * Display the specified resource.
 	 *
-	 * @param  int $id
+	 * @param int $id
 	 * @return Response
 	 */
 	public function show($id)
@@ -104,7 +103,7 @@ class ClientAuthController extends Controller
 	 * Update the specified resource in storage.
 	 *
 	 * @param Request $request
-	 * @param  int $id
+	 * @param int $id
 	 * @return Response
 	 */
 	public function update(Request $request, $id)
@@ -154,7 +153,7 @@ class ClientAuthController extends Controller
 	/**
 	 * Remove the specified resource from storage.
 	 *
-	 * @param  int $id
+	 * @param int $id
 	 * @return Response
 	 */
 	public function destroy($id)
