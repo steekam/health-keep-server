@@ -2,14 +2,13 @@
 
 namespace App\Models;
 
-use App\Mail\ForgotPasswordEmail;
 use App\Notifications\ClientResetPasswordNotification;
-use Illuminate\Notifications\Notifiable;
+use App\Notifications\ClientVerifyEmailNotification;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Contracts\Auth\CanResetPassword;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
 
-class Client extends Authenticatable
+class Client extends Authenticatable implements MustVerifyEmail
 {
 	use  Notifiable;
 
@@ -45,18 +44,31 @@ class Client extends Authenticatable
 	/**
 	 * Roles relationships
 	 */
-	function roles() {
-		return $this->belongsToMany('App\Models\Client_role','client_map_roles','client_id','client_role_id');
+	function roles()
+	{
+		return $this->belongsToMany('App\Models\Client_role', 'client_map_roles', 'client_id', 'client_role_id');
 	}
 
 	/**
 	 * Send the password reset notification.
 	 *
-	 * @param  string $token
+	 * @param string $token
 	 * @return void
 	 */
 	public function sendPasswordResetNotification($token)
 	{
 		$this->notify(new ClientResetPasswordNotification($token));
 	}
+
+	/**
+	 * Send the email verification notification.
+	 *
+	 * @return void
+	 */
+	public function sendEmailVerificationNotification()
+	{
+		$this->notify(new ClientVerifyEmailNotification());
+	}
+
+
 }
