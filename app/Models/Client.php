@@ -5,6 +5,8 @@ namespace App\Models;
 use App\Notifications\ClientResetPasswordNotification;
 use App\Notifications\ClientVerifyEmailNotification;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -47,6 +49,23 @@ class Client extends Authenticatable implements MustVerifyEmail
 	function roles()
 	{
 		return $this->belongsToMany('App\Models\Client_role', 'client_map_roles', 'client_id', 'client_role_id');
+	}
+
+	/**
+	 * Appointment relationship
+	 * @return HasMany
+	 */
+	function appointments()
+	{
+		return $this->hasMany('App\Models\Appointment','client_id', 'client_id');
+	}
+
+	/**
+	 * Get appointment reminders for clients
+	 * @return HasManyThrough
+	 */
+	function appointment_reminders() {
+		return $this->hasManyThrough('App\Models\Reminder', 'App\Models\Appointment');
 	}
 
 	/**

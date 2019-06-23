@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class CreateAppointmentsTable extends Migration
 {
@@ -16,11 +16,12 @@ class CreateAppointmentsTable extends Migration
     Schema::create('appointments', function (Blueprint $table) {
       $table->bigIncrements('appointment_id');
       $table->string('title');
-      $table->string('description', 255);
-      $table->dateTime('appointment_date');
+      $table->string('description', 255)->nullable();
+      $table->date('appointment_date');
+      $table->time('appointment_time');
       $table->string('location')->nullable();
       $table->unsignedBigInteger('client_id')->unsigned();
-      $table->string('status');
+      $table->boolean('archived')->default(false);
       $table->timestamps();
 
       $table->foreign('client_id')

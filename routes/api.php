@@ -19,11 +19,18 @@ Route::prefix('v1')->group(function () {
 	//? Api key protected routes
 	Route::group(['middleware' => 'auth:api'], function () {
 		Route::post('client_login', 'Api\ClientAuthController@login');
-		Route::apiResources([
-			'clients' => 'Api\ClientAuthController'
-		]);
+		Route::apiResource('clients', 'Api\ClientAuthController');
+		//? Email verification client
+		Route::get('email/resend/{id}', 'Api\ClientVerificationController@resend')->name('client.verification.resend');
 
-		//? Email verification
-		Route::get('email/resend/{id}','Api\ClientVerificationController@resend')->name('client.verification.resend');
+		//? Appointments
+		Route::apiResource('appointments', 'Api\AppointmentController', [
+			'only' => ['show', 'update', 'destroy']
+		]);
+		Route::prefix('clients/{client}')->group(function () {
+			Route::apiResource('appointments', 'Api\AppointmentController', [
+				'only' => ['index', 'store']
+			]);
+		});
 	});
 });
