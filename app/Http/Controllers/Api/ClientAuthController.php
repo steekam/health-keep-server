@@ -119,7 +119,8 @@ class ClientAuthController extends Controller
 						break;
 					case 'email':
 						$client->$key = $value;
-						$client->email_verified_at = null;
+						//? temporary disable un-verification for email change
+//						$client->email_verified_at = null;
 						break;
 					case 'client_role':
 						break;
