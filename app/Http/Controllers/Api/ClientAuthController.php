@@ -131,7 +131,7 @@ class ClientAuthController extends Controller
 				}
 			}
 			$client->save();
-			return response()->json(['success' => $client], $this->successStatus);
+			return response()->json($client, $this->successStatus);
 		} catch (Throwable $th) {
 			$error_res = '';
 			switch (get_class($th)) {
