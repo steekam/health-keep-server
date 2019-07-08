@@ -20,6 +20,9 @@ Route::prefix('v1')->group(function () {
 	Route::group(['middleware' => 'auth:api'], function () {
 		Route::post('client_login', 'Api\ClientAuthController@login');
 		Route::apiResource('clients', 'Api\ClientAuthController');
+		//Password change in-app
+		Route::put('clients/password_change/{client}', 'Api\ClientAuthController@passwordReset')
+			->name('clients.password_change');
 		//? Email verification client
 		Route::get('email/resend/{id}', 'Api\ClientVerificationController@resend')->name('client.verification.resend');
 
