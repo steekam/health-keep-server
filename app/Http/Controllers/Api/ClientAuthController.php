@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Client;
 use App\Models\Client_role;
 use Exception;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
@@ -114,9 +116,6 @@ class ClientAuthController extends Controller
 			$client = Client::with('roles')->findOrFail($id);
 			foreach ($inputs as $key => $value) {
 				switch ($key) {
-					case 'password':
-						$client->$key = Hash::make($value);
-						break;
 					case 'email':
 						$client->$key = $value;
 						//? temporary disable un-verification for email change
@@ -147,8 +146,48 @@ class ClientAuthController extends Controller
 			}
 			return response()->json([
 				'error' => $error_res,
-			]);
+			], $this->errorStatus);
 		}
+	}
+
+	/**
+	 * Update client's password
+	 * @param Request $request
+	 * @param $id
+	 * @return JsonResponse
+	 */
+	public function passwordReset(Request $request, $id)
+	{
+		try {
+			if (empty($id)) throw new Exception("Missing client_id");
+			$client = Client::with('roles')->findOrFail($id);
+		} catch (Throwable $throwable) {
+			if ($throwable instanceof ModelNotFoundException) {
+				$error_res = 'No record found';
+			} else {
+				$error_res = $throwable->getMessage();
+			}
+			return response()->json([
+				'error' => $error_res,
+			], $this->errorStatus);
+		}
+		$data = $request->all();
+		Validator::make($data, [
+			'old_password' => 'required|old_password:' . $client->getAuthPassword(),
+			'new_password' => 'required',
+		], [
+			'old_password' => 'Invalid old password'
+		])->validate();
+		try {
+			$client->password = Hash::make($data['new_password']);
+			$client->save();
+		} catch (Throwable $throwable) {
+			$error_res = $throwable->getMessage();
+			return response()->json([
+				'error' => $error_res,
+			], $this->errorStatus);
+		}
+		return response()->json($client);
 	}
 
 	/**
